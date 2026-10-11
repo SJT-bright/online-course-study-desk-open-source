@@ -47,6 +47,7 @@ async function start() {
     const u = new URL(request.url);
     if (u.host !== 'app' || u.username || u.password) return new Response('forbidden', { status: 403 });
     const appPage = u.pathname === '/' || u.pathname === '/index.html';
+    const guide = decodeURIComponent(u.pathname) === '/转写配置指南.html';
     const launch = u.searchParams.get('launch');
     if (u.pathname === '/_studydesk/health') return new Response('forbidden', { status: 403 });
     const headers = new Headers(request.headers);
@@ -59,6 +60,7 @@ async function start() {
       headers.set('x-studydesk-shell', shellToken);
       u.searchParams.delete('launch');
     }
+    if (guide) headers.set('x-studydesk-shell', shellToken);
     const destination = new URL(u.pathname + u.search, service.url);
     const options = { method: request.method, headers, redirect: 'manual' };
     if (!['GET', 'HEAD'].includes(request.method)) options.body = Buffer.from(await request.arrayBuffer());
@@ -106,6 +108,7 @@ function makeWindow(internal) {
   const win = new BrowserWindow({ title: '网课学习工作台', width: 1400, height: 920, minWidth: 740, minHeight: 560, show: !smoke, backgroundColor: '#182019', webPreferences: { partition: internal ? 'persist:study-desk' : 'persist:course-pages', nodeIntegration: false, contextIsolation: true, sandbox: true } });
   pages.add(win); win.on('closed', () => pages.delete(win));
   win.webContents.setWindowOpenHandler(({ url }) => {
+    if (internal && (url === 'about:blank' || decodeURIComponent(url) === APP_URL + '转写配置指南.html')) return { action: 'allow', overrideBrowserWindowOptions: { webPreferences: { partition: 'persist:study-desk', nodeIntegration: false, contextIsolation: true, sandbox: true } } };
     if (internal && url.startsWith(APP_URL + 'api/')) win.webContents.downloadURL(url);
     else if (/^https?:\/\//i.test(url)) openPage(url);
     return { action: 'deny' };
@@ -140,17 +143,27 @@ async function runSmoke() {
     assert(document.querySelector('#video'), 'video missing');
     assert(typeof require === 'undefined', 'Node exposed to renderer');
     const response = await fetch('/api/recent-links'); assert(response.ok, 'API blocked');
+    const guide = await fetch('/' + encodeURIComponent('转写配置指南') + '.html'); assert(guide.ok, 'guide blocked');
     const locked = await fetch('/index.html'); assert(locked.status === 403, 'shell token exposed');
     const value = 'windows-中文-' + Date.now(); localStorage.setItem('smoke', value);
     const db = await new Promise((resolve,reject) => { const q = indexedDB.open('smoke-db',1); q.onupgradeneeded=()=>q.result.createObjectStore('kv'); q.onsuccess=()=>resolve(q.result); q.onerror=()=>reject(q.error); });
     await new Promise((resolve,reject)=>{const t=db.transaction('kv','readwrite');t.objectStore('kv').put(new Blob(['recording']), 'audio');t.oncomplete=resolve;t.onerror=()=>reject(t.error);}); db.close();
     return { ui: true, api: true, sandbox: true, stableOrigin: location.origin, localStorage: value };
   })()`);
+  const download = new Promise((resolve, reject) => {
+    const timer = setTimeout(() => reject(new Error('backup download timeout')), 15000);
+    session.fromPartition('persist:study-desk').once('will-download', (event, item) => {
+      const output = path.join(data, 'smoke-backup.json'); item.setSavePath(output);
+      item.once('done', (event, state) => { clearTimeout(timer); if (state !== 'completed') reject(new Error('backup download ' + state)); else { JSON.parse(fs.readFileSync(output,'utf8')); resolve(); } });
+    });
+  });
+  await mainWindow.webContents.executeJavaScript("window.open('/api/transcripts/backup', '_blank'); true;");
+  await download;
   // Reload verifies real Chromium storage and fresh shell authorization.
   await loadDesk(mainWindow);
   const stored = await mainWindow.webContents.executeJavaScript(`(async()=>{const db=await new Promise(r=>{const q=indexedDB.open('smoke-db',1);q.onsuccess=()=>r(q.result);});const v=await new Promise(r=>{const t=db.transaction('kv');const q=t.objectStore('kv').get('audio');q.onsuccess=()=>r(q.result);});db.close();return {text:await v.text(),local:localStorage.getItem('smoke')};})()`);
   if (stored.text !== 'recording' || stored.local !== result.localStorage) throw new Error('persistent storage lost');
-  await fs.promises.writeFile(process.env.STUDYDESK_SMOKE_RESULT, JSON.stringify({ ok: true, platform: process.platform, version: app.getVersion(), service, ...result, blobAfterReload: true, asrNativeRuntime: true, persistedAcrossRestart: !!expected }));
+  await fs.promises.writeFile(process.env.STUDYDESK_SMOKE_RESULT, JSON.stringify({ ok: true, platform: process.platform, version: app.getVersion(), service, ...result, blobAfterReload: true, asrNativeRuntime: true, authenticatedDownload: true, guide: true, persistedAcrossRestart: !!expected }));
   session.fromPartition('persist:study-desk').flushStorageData();
   app.exit(0);
 }

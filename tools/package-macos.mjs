@@ -6,11 +6,8 @@ if (process.platform !== 'darwin') throw new Error('Build the native app on macO
 if (fs.existsSync(app)) throw new Error('dist/StudyDesk.app already exists; move it aside before building');
 fs.mkdirSync(path.join(contents,'MacOS'),{recursive:true});
 fs.mkdirSync(path.join(contents,'Resources/app'),{recursive:true});
-fs.mkdirSync(path.join(contents,'Resources/runtime'),{recursive:true});
 fs.copyFileSync(path.join(root,'macos/build/StudyDesk'),path.join(contents,'MacOS/StudyDesk'));
-fs.copyFileSync(process.execPath,path.join(contents,'Resources/runtime/node'));
-fs.chmodSync(path.join(contents,'Resources/runtime/node'),0o755);
 for (const item of ['server.mjs','feishu-url.mjs','网课学习工作台.html','转写配置指南.html','lib','vendor','local-asr','LICENSE','THIRD_PARTY_NOTICES.md','licenses']) fs.cpSync(path.join(root,item),path.join(contents,'Resources/app',item),{recursive:true});
-fs.writeFileSync(path.join(contents,'Info.plist'),`<?xml version="1.0"?><!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd"><plist version="1.0"><dict><key>CFBundleExecutable</key><string>StudyDesk</string><key>CFBundleIdentifier</key><string>io.github.sjtbright.studydesk.native</string><key>CFBundleName</key><string>网课学习工作台</string><key>CFBundleShortVersionString</key><string>3.7.0</string><key>CFBundleVersion</key><string>370</string><key>NSHighResolutionCapable</key><true/><key>NSMicrophoneUsageDescription</key><string>用于本机语音转写</string></dict></plist>`);
+fs.writeFileSync(path.join(contents,'Info.plist'),`<?xml version="1.0"?><!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd"><plist version="1.0"><dict><key>CFBundleExecutable</key><string>StudyDesk</string><key>CFBundleIdentifier</key><string>io.github.sjtbright.studydesk.native</string><key>CFBundleName</key><string>网课学习工作台</string><key>CFBundleShortVersionString</key><string>3.7.1</string><key>CFBundleVersion</key><string>370</string><key>NSHighResolutionCapable</key><true/><key>NSMicrophoneUsageDescription</key><string>用于本机语音转写</string></dict></plist>`);
 execFileSync('/usr/bin/codesign',['--force','--deep','--sign','-','--timestamp=none',app],{stdio:'inherit'});
 console.log(app);

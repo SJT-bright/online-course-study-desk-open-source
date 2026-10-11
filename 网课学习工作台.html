@@ -1977,6 +1977,11 @@ const __SD_TOKEN = "__SD_API_TOKEN__";
     } catch {}
     return _fetch.call(this, input, init);
   };
+  const _open = window.open;
+  window.open = function(input, ...args) {
+    if (needsToken(input)) { const x = new URL(input, location.href); x.searchParams.set('sd_token', __SD_TOKEN); input = x.href; }
+    return _open.call(this, input, ...args);
+  };
 })();
 const $ = s => document.querySelector(s);
 const video = $("#video"), paper = $("#paper"), seek = $("#seek");
@@ -7487,7 +7492,7 @@ document.getElementById("sttWeekPdfBtn").onclick = sttWeekPdf;
 
 /* ── 升级引导卡：版本变化时展示一次 ── */
 (function(){
-  const VER = "3.7.0";
+  const VER = "3.7.1";
   const wn = document.getElementById("whatsNew");
   if (!wn) return;
   // 更新说明按需查看，不在上课时自动遮挡笔记。

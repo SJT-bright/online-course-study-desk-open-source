@@ -2,7 +2,7 @@
 
 本地优先的网课播放、时间戳笔记、课程整理、转写和复习工作台。**macOS 原生启动器和 Windows 桌面端全部开源**，共用学习界面与本地服务。
 
-版本 **3.7.0** · [下载 Windows 安装包](https://github.com/SJT-bright/online-course-study-desk-open-source/releases/latest) · [Windows 说明](docs/windows.md) · [MIT 许可证](LICENSE)
+版本 **3.7.1** · [下载 Windows 安装包](https://github.com/SJT-bright/online-course-study-desk-open-source/releases/latest) · [Windows 说明](docs/windows.md) · [MIT 许可证](LICENSE)
 
 ## 功能
 
@@ -16,7 +16,7 @@
 
 ## Windows 用户
 
-在 [Releases](https://github.com/SJT-bright/online-course-study-desk-open-source/releases) 下载 `StudyDesk-3.7.0-windows-x64.exe`，按向导安装。也提供 ZIP，解压后运行 `StudyDesk.exe`。支持 Windows 10 / 11 x64。安装包内含独立 Node.js 和本机语音引擎，无需另装 Node。
+在 [Releases](https://github.com/SJT-bright/online-course-study-desk-open-source/releases) 下载 `StudyDesk-3.7.1-windows-x64.exe`，按向导安装。也提供 ZIP，解压后运行 `StudyDesk.exe`。支持 Windows 10 / 11 x64。安装包内含独立 Node.js 和本机语音引擎，无需另装 Node。
 
 学习数据位于 `%APPDATA%/StudyDesk/`，更新或卸载不主动删除该目录。默认录音媒体目录为用户下载文件夹下的 `StudyDesk`。需要搬到另一台电脑时，请在课程库导出学习备份，另行复制视频与讲义。
 
