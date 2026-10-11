@@ -39,6 +39,7 @@ async function start() {
   const started = await exec(node, [path.join(root, 'lib/desktop-start.mjs')], { cwd: root, env, timeout: 90000, windowsHide: true, maxBuffer: 1024 * 1024 });
   service = JSON.parse(started.stdout.trim().split('\n').at(-1));
   if (!service.ok) throw new Error(service.error || '服务启动失败');
+  if (smoke) await exec(node, ['-e', 'const s = require(' + JSON.stringify(path.join(root, 'local-asr/node_modules/sherpa-onnx-node')) + '); if (typeof s.OnlineRecognizer !== "function") process.exit(2);'], { windowsHide: true });
   const shellToken = fs.readFileSync(path.join(home, '.study-desk/shell.token'), 'utf8').trim();
   const internal = session.fromPartition('persist:study-desk');
   // A stable origin keeps IndexedDB, Blob recordings and settings across port changes.
@@ -128,6 +129,11 @@ function openPage(url) {
   const win = makeWindow(false); win.loadURL(target.href).catch(() => {});
 }
 async function runSmoke() {
+  const expected = process.env.STUDYDESK_SMOKE_EXPECT;
+  if (expected) {
+    const before = await mainWindow.webContents.executeJavaScript(`(async()=>{const db=await new Promise(r=>{const q=indexedDB.open('smoke-db',1);q.onsuccess=()=>r(q.result);});const v=await new Promise(r=>{const q=db.transaction('kv').objectStore('kv').get('audio');q.onsuccess=()=>r(q.result);});db.close();return {text:await v.text(),local:localStorage.getItem('smoke')};})()`);
+    if (before.text !== 'recording' || before.local !== expected) throw new Error('storage lost across restart/port change');
+  }
   const result = await mainWindow.webContents.executeJavaScript(`(async () => {
     const assert = (v,m) => { if (!v) throw new Error(m); };
     assert(document.querySelector('#platformToggle'), 'UI missing');
@@ -144,6 +150,7 @@ async function runSmoke() {
   await loadDesk(mainWindow);
   const stored = await mainWindow.webContents.executeJavaScript(`(async()=>{const db=await new Promise(r=>{const q=indexedDB.open('smoke-db',1);q.onsuccess=()=>r(q.result);});const v=await new Promise(r=>{const t=db.transaction('kv');const q=t.objectStore('kv').get('audio');q.onsuccess=()=>r(q.result);});db.close();return {text:await v.text(),local:localStorage.getItem('smoke')};})()`);
   if (stored.text !== 'recording' || stored.local !== result.localStorage) throw new Error('persistent storage lost');
-  await fs.promises.writeFile(process.env.STUDYDESK_SMOKE_RESULT, JSON.stringify({ ok: true, platform: process.platform, version: app.getVersion(), service, ...result, blobAfterReload: true }));
+  await fs.promises.writeFile(process.env.STUDYDESK_SMOKE_RESULT, JSON.stringify({ ok: true, platform: process.platform, version: app.getVersion(), service, ...result, blobAfterReload: true, asrNativeRuntime: true, persistedAcrossRestart: !!expected }));
+  session.fromPartition('persist:study-desk').flushStorageData();
   app.exit(0);
 }

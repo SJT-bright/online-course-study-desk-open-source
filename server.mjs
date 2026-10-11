@@ -50,13 +50,15 @@ const TOOLS = path.join(ROOT, "tools");
 const YTDLP = process.env.STUDYDESK_YTDLP || toolPath(["yt-dlp"], { envName: "STUDYDESK_YTDLP" }) || path.join(TOOLS, process.platform === "win32" ? "yt-dlp.exe" : "yt-dlp_macos");
 const COOKIE_FILE = existsSync(resolveStoredPath(path.join(TOOLS, "bili-cookies.txt"))) ? resolveStoredPath(path.join(TOOLS, "bili-cookies.txt")) : path.join(HOME, '.study-desk', 'bili-cookies.txt');
 /* 本地 Whisper 精转（离线、不上传） */
-const WHISPER_MODEL_DIR = process.env.STUDYDESK_MODEL_DIR || resolveStoredPath(path.join(TOOLS, "models"));
+const LEGACY_MODELS = resolveStoredPath(path.join(TOOLS, "models"));
+const WHISPER_MODEL_DIR = process.env.STUDYDESK_MODEL_DIR || (existsSync(LEGACY_MODELS) ? LEGACY_MODELS : path.join(HOME, ".study-desk/models/whisper"));
 const WHISPER_MODELS = {
   base:  { file: "ggml-base.bin",  url: "https://hf-mirror.com/ggerganov/whisper.cpp/resolve/main/ggml-base.bin",  approx: 148000000, label: "base · 快" },
   small: { file: "ggml-small.bin", url: "https://hf-mirror.com/ggerganov/whisper.cpp/resolve/main/ggml-small.bin", approx: 466000000, label: "small · 更准" },
 };
 function findWhisperBin() { return toolPath(["whisper-cli", "whisper-cpp"], { envName: "STUDYDESK_WHISPER" }); }
-const DOWNLOAD_DIR = process.env.STUDYDESK_DOWNLOAD_DIR || resolveStoredPath(path.join(ROOT, "downloads"));
+const LEGACY_DOWNLOADS = resolveStoredPath(path.join(ROOT, "downloads"));
+const DOWNLOAD_DIR = process.env.STUDYDESK_DOWNLOAD_DIR || (existsSync(LEGACY_DOWNLOADS) ? LEGACY_DOWNLOADS : path.join(HOME, ".study-desk/downloads"));
 /* ═══════════════ 豆包语音转写（火山引擎官方 API） ═══════════════ */
 const { randomUUID } = crypto;   /* 豆包会话/临时文件 ID */
 
