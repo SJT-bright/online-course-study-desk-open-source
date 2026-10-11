@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>豆包语音转写配置指南 · 网课学习工作台</title>
+<style>
+  :root{
+    --bg:#FAFAF8; --panel:#FFFFFF; --text:#1D1D1F; --muted:#6E6E73; --faint:#A1A1A6;
+    --line:#E8E6E1; --accent:#0A84FF; --ok:#248A3D; --warn:#C93400;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB",sans-serif;background:var(--bg);color:var(--text);line-height:1.75;padding:40px 20px}
+  main{max-width:760px;margin:0 auto}
+  h1{font-size:26px;letter-spacing:-.02em;margin-bottom:6px}
+  .sub{color:var(--muted);font-size:14px;margin-bottom:28px}
+  h2{font-size:18px;margin:32px 0 12px;padding-top:18px;border-top:0.5px solid var(--line);letter-spacing:-.01em}
+  h3{font-size:15px;margin:18px 0 8px}
+  p,li{font-size:14.5px}
+  ul,ol{padding-left:22px;margin:8px 0}
+  li{margin:5px 0}
+  code{font-family:ui-monospace,Menlo,monospace;font-size:12.5px;background:rgba(120,120,128,.12);border-radius:5px;padding:1.5px 6px}
+  pre{background:#1D1D1F;color:#F5F5F7;border-radius:12px;padding:14px 18px;font-size:12.5px;overflow-x:auto;margin:10px 0}
+  pre code{background:none;color:inherit;padding:0}
+  .card{background:var(--panel);border:0.5px solid var(--line);border-radius:16px;padding:18px 20px;margin:12px 0;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+  .step{display:flex;gap:14px;margin:14px 0}
+  .step-n{flex-shrink:0;width:26px;height:26px;border-radius:50%;background:var(--accent);color:#fff;font-size:13px;font-weight:650;display:flex;align-items:center;justify-content:center;margin-top:2px}
+  .step b{display:block;margin-bottom:2px}
+  .step p{color:var(--text)}
+  .tip{border-left:3px solid var(--accent);background:rgba(10,132,255,.05);border-radius:0 10px 10px 0;padding:10px 14px;font-size:13.5px;margin:12px 0}
+  .warn{border-left:3px solid #FF9F0A;background:rgba(255,159,10,.07);border-radius:0 10px 10px 0;padding:10px 14px;font-size:13.5px;margin:12px 0}
+  table{width:100%;border-collapse:collapse;font-size:13.5px;margin:10px 0}
+  th,td{border:0.5px solid var(--line);padding:8px 12px;text-align:left;vertical-align:top}
+  th{background:var(--panel);font-weight:600}
+  .k{white-space:nowrap;font-family:ui-monospace,Menlo,monospace;font-size:12px}
+  footer{margin-top:40px;padding-top:16px;border-top:0.5px solid var(--line);color:var(--faint);font-size:12.5px}
+</style>
+</head>
+<body>
+<main>
+  <h1>豆包语音转写配置指南</h1>
+  <div class="sub">网课学习工作台 · 语音转文字功能 · 全程约 10 分钟</div>
+
+  <div class="card">
+    <b>这个功能做什么？</b>
+    <p style="margin-top:6px">在应用内一键把声音变成带标点、带时间戳的文字，支持三种来源：<b>麦克风</b>（自己说话 / 收外放）、<b>系统声音</b>（网课、直播、会议播放的声音）、<b>本地文件</b>（已录好的音视频）。转写结果自动存入台账，可搜索、编辑、导出 TXT / MD / DOCX。</p>
+  </div>
+
+  <h2>第一步：开通豆包语音转写（一次性）</h2>
+  <div class="step"><div class="step-n">1</div><div>
+    <b>注册 / 登录火山引擎</b>
+    <p>打开 <a href="https://console.volcengine.com" target="_blank">console.volcengine.com</a>，用手机号注册并完成实名认证。</p>
+  </div></div>
+  <div class="step"><div class="step-n">2</div><div>
+    <b>开通「豆包流式语音识别模型」</b>
+    <p>控制台搜索「<b>豆包语音</b>」（或访问 <a href="https://console.volcengine.com/speech/service/10029" target="_blank">语音服务页</a>）→ 找到「<b>豆包流式语音识别模型 2.0</b>」→ 点「<b>开通</b>」。新用户通常有免费额度；计费按小时版时长或并发版选择其一。</p>
+    <div class="tip">选「小时版」资源（默认推荐）则保持本应用默认资源 ID 不动；若你开通的是「并发版」，在应用设置的「模型版本」里切换即可。</div>
+  </div></div>
+  <div class="step"><div class="step-n">3</div><div>
+    <b>创建 API Key</b>
+    <p>控制台 →「<b>API Key 管理</b>」→ 新建 API Key → 复制保存（形如一串密钥，只显示一次）。</p>
+  </div></div>
+  <div class="step"><div class="step-n">4</div><div>
+    <b>填入本应用</b>
+    <p>打开工作台 → 顶栏「<b>直播课堂</b>」→ 找到「<b>豆包语音转写</b>」区 → 点「<b>设置</b>」→ 粘贴 API Key → 保存。徽标变绿「已配置」即可开始转写。</p>
+  </div></div>
+
+  <h2>第二步：三种转写来源怎么选</h2>
+  <table>
+    <tr><th>来源</th><th>适用场景</th><th>前置条件</th></tr>
+    <tr><td><b>麦克风</b></td><td>对着麦克风说话；或让麦克风收电脑外放的声音（简洁但受环境音影响）</td><td>无需额外安装，首次使用允许本地应用使用麦克风</td></tr>
+    <tr><td><b>系统声音</b></td><td>看网课 / 直播 / 会议时，直接转写「电脑里播放出的声音」，最清晰准确</td><td>安装 BlackHole 虚拟声卡（见下方）</td></tr>
+    <tr><td><b>本地文件</b></td><td>已录好的 mp3 / m4a / wav / mp4 等音视频整段转写</td><td>本机已装 ffmpeg（<code>brew install ffmpeg</code>），你的电脑已具备</td></tr>
+  </table>
+
+  <h2>收系统声音：安装 BlackHole（一次性，约 3 分钟）</h2>
+  <p>想转写「网课/直播里播出来的声音」而不是麦克风收外放，需要把系统声音接入转写通道：</p>
+  <ol>
+    <li>终端执行：<code>brew install blackhole-2ch</code>（装完需重启一次电脑）</li>
+    <li>系统设置 → 声音 → 输出设备：正常听课时保持你的扬声器/耳机</li>
+    <li>在工作台「直播课堂」面板的设备下拉里，转写时选 <b>BlackHole 2ch</b> 作为输入</li>
+  </ol>
+  <div class="warn"><b>想「边听边转」两不误？</b>打开「音频 MIDI 设置」（Spotlight 搜索）→ 点左下 + → 创建「多输出设备」→ 勾选你的扬声器 + BlackHole 2ch → 系统输出切到这个多输出设备。这样声音同时从扬声器播出、并被转写通道捕获。</div>
+
+  <h2>怎么用：一条流程学完不跳出去</h2>
+  <div class="step"><div class="step-n">1</div><div><b>进课程</b><p>顶栏「平台」/「小窗」在内嵌窗口打开小鹅通、腾讯会议、B 站等页面并登录；或直接播放本地视频。</p></div></div>
+  <div class="step"><div class="step-n">2</div><div><b>开始转写</b><p>打开「直播课堂」面板 → 选来源 → 填课程名 → 点「开始转写」。实时字幕逐句出现（带时间戳）。</p></div></div>
+  <div class="step"><div class="step-n">3</div><div><b>结束保存</b><p>点「■ 结束」。结果自动存入「转写台账」，断电重启也不丢。</p></div></div>
+  <div class="step"><div class="step-n">4</div><div><b>回看利用</b><p>台账里点任意记录：可编辑修正、存入笔记、导出 TXT / MD / DOCX。</p></div></div>
+
+  <h2>常见问题</h2>
+  <div class="card">
+    <h3>提示「鉴权未通过 / Invalid X-Api-Key」</h3>
+    <p>Key 粘错了或已删除：重新复制粘贴；注意不要带空格。若刚开通服务，等 1–2 分钟再试。</p>
+    <h3>提示「403 被拒绝」</h3>
+    <p>该 Key 未开通「豆包流式语音识别模型」，回控制台开通；或资源 ID 版本与开通的不一致（小时版 ↔ 并发版在设置里切换）。</p>
+    <h3>提示「429 / 限流 / 额度」</h3>
+    <p>免费额度用尽或并发超限：控制台确认余额或购买资源包。转写中断时录音已本地缓存，恢复后可重新转写。</p>
+    <h3>转写没有任何字出来</h3>
+    <p>① 麦克风来源：检查系统设置→声音→输入，对着说话时电平有反应；② 系统声音来源：确认已按上文把声音路由到 BlackHole；③ 音量表（直播面板）有跳动说明采集正常，若不跳动则是来源选错。</p>
+    <h3>长直播会不会丢内容？</h3>
+    <p>已转写的文字每句实时落盘，进程异常退出也不丢已出字的句子；音频同时在本地持续缓存（应用异常恢复后可对缓存音频补转写）。建议 60 分钟以上的课中途手动点一次「结束」再「开始」，分段更稳。</p>
+  </div>
+
+  <h2>隐私说明</h2>
+  <ul>
+    <li>API Key 明文保存在本机 <code>~/.study-desk/doubao.json</code>（权限 600，仅当前用户可读），不上传到任何第三方。</li>
+    <li>转写音频仅实时传给火山引擎豆包识别接口用于转文字；转写结果、台账、录音缓存全部保存在本机 <code>downloads/transcripts/</code>。</li>
+    <li>工作台其余功能（笔记、课程库、备份）完全本地运行，不经第三方。</li>
+    <li>请仅对个人学习用途的课程内容做转写，尊重课程版权与平台条款。</li>
+  </ul>
+
+  <footer>网课学习工作台 · 豆包语音转写指南 · 2026-09</footer>
+</main>
+</body>
+</html>

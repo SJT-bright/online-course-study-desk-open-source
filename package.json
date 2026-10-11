@@ -1,0 +1,75 @@
+{
+  "name": "online-course-study-desk",
+  "version": "3.7.0",
+  "description": "本地优先的网课播放、时间戳笔记、转写和复习工作台",
+  "author": "SJT-bright",
+  "license": "MIT",
+  "private": true,
+  "main": "windows/main.cjs",
+  "engines": {
+    "node": ">=24.0.0"
+  },
+  "scripts": {
+    "start": "electron .",
+    "test": "node --test tests/*.test.mjs",
+    "prepare:windows": "node tools/prepare-windows.mjs",
+    "build:windows": "electron-builder --win nsis zip --x64 --publish never",
+    "smoke:desktop": "node tools/smoke-desktop.mjs"
+  },
+  "devDependencies": {
+    "electron": "44.7.0",
+    "electron-builder": "26.15.3"
+  },
+  "build": {
+    "appId": "io.github.sjtbright.studydesk",
+    "productName": "StudyDesk",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "windows/main.cjs",
+      "package.json",
+      "LICENSE",
+      "THIRD_PARTY_NOTICES.md",
+      "licenses/**"
+    ],
+    "extraResources": [
+      {
+        "from": ".windows-runtime",
+        "to": "runtime"
+      },
+      {
+        "from": ".",
+        "to": "backend",
+        "filter": [
+          "server.mjs",
+          "feishu-url.mjs",
+          "网课学习工作台.html",
+          "转写配置指南.html",
+          "lib/**",
+          "vendor/**",
+          "local-asr/package*.json",
+          "local-asr/node_modules/**",
+          "!**/*.log",
+          "!**/bili-cookies.txt",
+          "!**/*.db"
+        ]
+      }
+    ],
+    "win": {
+      "target": [
+        "nsis",
+        "zip"
+      ],
+      "artifactName": "StudyDesk-${version}-windows-${arch}.${ext}"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "deleteAppDataOnUninstall": false,
+      "createDesktopShortcut": true,
+      "shortcutName": "网课学习工作台"
+    }
+  }
+}

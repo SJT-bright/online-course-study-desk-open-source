@@ -1,0 +1,65 @@
+--- a/main.js	2026-09-27 01:41:56
++++ /tmp/lv-bridge-review/main.js	2026-09-27 03:05:32
+@@ -22,6 +22,7 @@
+ const { messagesToText } = require('./src/chat-parse');
+ const { parseChatText } = require('./src/chat-parse');
+ const srs = require('./src/srs');
++const { handleBridgeReview } = require('./src/bridge-review');
+ const nightly = require('./src/nightly');
+ const cardQA = require('./src/card-qa');
+ const ideas = require('./src/ideas');
+@@ -3300,6 +3301,26 @@
+   const body = JSON.stringify(obj);
+   res.writeHead(code, { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store' });
+   res.end(body);
++}
++// 复习卡标题与 ipc srs:due 同一查找：普通条目走资料库，金句 id（q 开头）走 getQuote
++function bridgeSrsItemTitle(itemId) {
++  if (!store) return '';
++  const it = itemId && !String(itemId).startsWith('q') ? store.get(itemId) : (store.getQuote ? store.getQuote(itemId) : null);
++  return it ? (it.title || '') : '';
++}
++function bridgeReviewDeps() {
++  return {
++    cards: srsCards,
++    schedule: srs.schedule,
++    dueCards: srs.dueCards,
++    newCard: srs.newCard,
++    save: saveSrsCards,
++    addEvent: (ev) => store.addEvent(ev),
++    pushSrsCount,
++    limit: loadConfig().srsDailyLimit,
++    getItem: (id) => store.get(id),
++    itemTitle: bridgeSrsItemTitle,
++  };
+ }
+ const bridgeServer = http.createServer(async (req, res) => {
+   try {
+@@ -3424,21 +3445,12 @@
+         .sort((a, b) => b.count - a.count);
+       return bridgeJson(res, 200, { categories });
+     }
+-    if (req.method === 'POST' && p === '/card') {
+-      const body = JSON.parse(await bridgeReadBody(req, 8192) || '{}');
+-      const front = String(body.front || '').trim();
+-      if (!front) return bridgeJson(res, 400, { error: '卡面是空的' });
+-      const back = String(body.back || '').trim();
+-      const srcId = String(body.sourceItemId || '') || null;
+-      if (srcId) {
+-        const srcIt = store.get(srcId);
+-        if (!srcIt || srcIt.trashed) return bridgeJson(res, 404, { error: 'not found' });
+-      }
+-      // 字段形状与 srs.newCard（手动成卡路径）完全一致，sourceItemId 映射到 itemId
+-      const card = srs.newCard({ itemId: srcId, kind: 'manual', front, back });
+-      srsCards.push(card);
+-      saveSrsCards();
+-      return bridgeJson(res, 200, { ok: true, id: card.id });
++    // 复习队列 / 评分 / 成卡（含 source 去重）。调度在 handleBridgeReview，仍用 src/srs.js。
++    if ((req.method === 'GET' && p === '/review/due') || (req.method === 'POST' && (p === '/review/grade' || p === '/card'))) {
++      const body = req.method === 'GET' ? null : JSON.parse(await bridgeReadBody(req, p === '/card' ? 8192 : 4096) || '{}');
++      const out = handleBridgeReview(p, req.method, body, bridgeReviewDeps());
++      if (!out) return bridgeJson(res, 404, { error: 'not found' });
++      return bridgeJson(res, out.status, out.body);
+     }
+     return bridgeJson(res, 404, { error: 'not found' });
+   } catch (e) {

@@ -1,0 +1,7 @@
+{
+  "private": true,
+  "description": "Bundled local streaming speech recognition runtime for Study Desk",
+  "dependencies": {
+    "sherpa-onnx-node": "1.13.8"
+  }
+}
