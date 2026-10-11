@@ -38,7 +38,7 @@ npm start
 
 ## macOS 原生源码
 
-`macos/StudyDesk.swift` 和 `macos/OriginStorage.swift` 提供 AppKit / WKWebView 启动器，处理端口切换时的学习数据备份迁移。Apple Silicon macOS 12+，安装 Xcode 命令行工具和 Node.js 24 后：
+`macos/StudyDesk.swift` 和 `macos/OriginStorage.swift` 提供 AppKit / WKWebView 启动器，处理端口切换时的学习数据备份迁移。Apple Silicon macOS 13.5+（Node.js 24 的系统要求），安装 Xcode 命令行工具和 Node.js 24 后：
 
 ```sh
 npm ci --prefix local-asr
